@@ -37,6 +37,8 @@ internal class DnsProxy(
             w("failed reading origin packet", e)
             return
         }
+        val inspector = Inspector ("OUT")
+        inspector.inspect(ktx, originEnvelope)
 
         if (originEnvelope.payload !is UdpPacket) return
 
@@ -78,6 +80,10 @@ internal class DnsProxy(
 
     override fun toDevice(response: ByteArray, length: Int, originEnvelope: Packet?) {
         originEnvelope as IpPacket
+
+        val inspector = Inspector ("IN")
+        inspector.inspect(ktx, originEnvelope)
+
         val udp = originEnvelope.payload as UdpPacket
         val udpResponse = UdpPacket.Builder(udp)
                 .srcAddr(originEnvelope.header.dstAddr)
